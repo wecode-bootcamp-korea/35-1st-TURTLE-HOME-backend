@@ -404,4 +404,4 @@ my_settings.py
 
 # DB 정보 숨기기
 db_uploaders.py
-*.csv
+csv
