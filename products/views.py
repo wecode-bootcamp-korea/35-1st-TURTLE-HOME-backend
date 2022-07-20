@@ -1,7 +1,7 @@
 from django.http  import JsonResponse
 from django.views import View
 
-from products.models import SubCategory
+from products.models import SubCategory, Product
 
 # Create your views here.
 class SubCategoryView(View):
@@ -19,5 +19,20 @@ class SubCategoryView(View):
         
         return JsonResponse({'message':result}, status=200)
         
+
+class ProductView(View):
+    def get(self, request):
+        products = Product.objects.all()
+        result   = []
         
-    
+        for product in products:
+            result.append({
+                'id'             : product.id,
+                'name'           : product.name,
+                'number'         : product.number,
+                'description'    : product.description,
+                'image_url'      : product.image_url,
+                'sub_category_id': product.sub_category_id
+            })
+        
+        return JsonResponse({'message':result}, status=200)
