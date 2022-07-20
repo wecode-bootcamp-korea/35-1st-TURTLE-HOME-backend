@@ -1,5 +1,7 @@
 from django.db import models
 
+from core.models import TimeStampeModel
+
 # Create your models here.
 
 class Category(models.Model):
@@ -22,7 +24,7 @@ class Size(models.Model):
     class Meta:
         db_table = 'sizes'
 
-class Product(models.Model):
+class Product(TimeStampeModel):
     name         = models.CharField(max_length=100)
     number       = models.CharField(max_length=100)
     description  = models.CharField(max_length=200)
