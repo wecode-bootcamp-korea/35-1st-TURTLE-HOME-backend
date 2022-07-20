@@ -1,12 +1,14 @@
-import json, re, bcrypt
+import json
+import re
+import bcrypt
 
-from django.http import JsonResponse
-from django.views import View
+from django.http            import JsonResponse
+from django.views           import View
 from django.core.exceptions import ValidationError
 
 
-from users.validation import email_check, password_check
-from .models import User
+from .validation import email_check, password_check
+from .models     import User
 
 # Create your views here.
 
@@ -23,10 +25,10 @@ class SignUpView(View):
             email_check(user_email)
 
             if User.objects.filter(email=user_email).exists(): 
-                return JsonResponse({'MESSAGE' : 'EXISTENT_EMAIL'}, status=400)
+                return JsonResponse({'message' : 'EXISTENT_EMAIL'}, status=400)
 
             if User.objects.filter(phone_number=user_phone).exists():
-                return JsonResponse({'MESSAGE' : 'EXISTENT_PHONE_NUMBER'}, status=400)
+                return JsonResponse({'message' : 'EXISTENT_PHONE_NUMBER'}, status=400)
 
             password_check(user_password)
 
@@ -39,9 +41,9 @@ class SignUpView(View):
                 address      = user_address,
                 phone_number = user_phone
             )
-            return JsonResponse({'MESSAGE' : 'SUCCESS'}, status=201)
+            return JsonResponse({'message' : 'SUCCESS'}, status=201)
         except KeyError: 
-            return JsonResponse({'MESSAGE' : 'KEY_ERROR'}, status=400)
+            return JsonResponse({'message' : 'KEY_ERROR'}, status=400)
         except ValidationError: 
-            return JsonResponse({'MESSAGE' : 'INVALID_USER'}, status=400)
+            return JsonResponse({'message' : 'INVALID_USER'}, status=400)
 
