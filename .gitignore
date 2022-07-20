@@ -401,3 +401,7 @@ zsdoc/data
 # End of https://www.toptal.com/developers/gitignore/api/python,pycharm,vim,zsh,visualstudiocode,macos,linux
 
 my_settings.py
+
+# DB 정보 숨기기
+db_uploaders.py
+*.csv
