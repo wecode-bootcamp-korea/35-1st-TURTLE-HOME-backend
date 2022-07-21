@@ -3,3 +3,4 @@ django-cors-headers==3.13.0
 mysqlclient==2.1.1
 PyMySQL==1.0.2
 bcrypt==3.2.2
+PyJWT==2.4.0
