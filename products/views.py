@@ -1,7 +1,7 @@
 from django.http  import JsonResponse
 from django.views import View
 
-from products.models import Product, ProductOption, SubCategory
+from products.models import Product, SubCategory
 
 # Create your views here.
 
