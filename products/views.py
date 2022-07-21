@@ -12,7 +12,7 @@ class SubCategoryView(View):
         result        = []
         
         if not subcategories:
-            return JsonResponse({'message':'Subcategory does not exist.'}, status=401)
+            return JsonResponse({'message':'Subcategory does not exist.'}, status=400)
         
         for subcategory in subcategories:
             result.append({
