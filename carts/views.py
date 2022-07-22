@@ -3,29 +3,28 @@ import json
 from django.views     import View
 from django.http      import JsonResponse
 
-from users.models     import Cart
-from products.models  import ProductOption
-from users.utils      import 데코레이터
+from .models          import Cart
+from core.utils       import signin_decorator
 
 # Create your views here.
 
 class CartView(View):
-    @데코레이터
+    @signin_decorator
     def post(self, request):
         try:
             data       = json.loads(request.body)
-            user_id    = request.user
-            product_id = data['product_option_id']
-            quantity   = data['quantity']
+            user       = request.user #토큰으로 확인후 인증이된 유저
+            product_id = data['product_option_id'] # 클라이언트가 요청하는 값
+            quantity   = int(data['quantity'])
 
-            if quantity <= 0:
+            if quantity <= 0: #수량이 정수가 아니면 에러 반환
                 return JsonResponse({'message' : 'QUANTITY_ERROR'}, status=400)
 
             cart, is_created = Cart.objects.get_or_create(
-                user_id    = user_id,
-                produtc_id = product_id
+                user              = user,
+                product_option_id = product_id # 클라이언트가 요청한 값이 있는 변수를 option_id로 변환해서 카트에 값을 저장
             )
-            cart.quantity = quantity
+            cart.quantity = cart.quantity + quantity
             cart.save()
             
             return JsonResponse({'message' : 'SUCCESS'}, status=201)
@@ -34,28 +33,4 @@ class CartView(View):
             return JsonResponse({'message' : 'INVALID_CART'}, status=400)
 
         except KeyError:
-            return JsonResponse({'message' : 'KEY_ERROR'}, status=400)
-
-    @데코레이터
-    def post(self, request):
-        try:
-            data       = json.loads(request.body)
-            user_id    = request.user
-            product_id = data['products_options_id']
-            quantity   = data['quantity']
-            
-            cart, is_created = Cart.objects.get_or_create(
-                user_id    = user_id,
-                product_id = product_id
-            )
-            quantity =- 1
-            cart.quantity =+ quantity
-            cart.save()
-
-            return JsonResponse({'message' : 'SUCCESS'}, status= 201)
-
-        except Cart.DoesNotExist: 
-            return JsonResponse({'message' : 'INVALID_CART'}, status=400)
-
-        except KeyError: 
             return JsonResponse({'message' : 'KEY_ERROR'}, status=400)
