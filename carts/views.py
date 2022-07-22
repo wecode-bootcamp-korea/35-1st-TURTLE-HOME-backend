@@ -12,17 +12,17 @@ class CartView(View):
     @signin_decorator
     def post(self, request):
         try:
-            data       = json.loads(request.body)
-            user       = request.user
-            product_id = data['product_option_id']
-            quantity   = int(data['quantity'])
+            data              = json.loads(request.body)
+            user              = request.user
+            product_option_id = data['product_option_id']
+            quantity          = int(data['quantity'])
 
             if quantity <= 0:
                 return JsonResponse({'message' : 'QUANTITY_ERROR'}, status=400)
 
             cart, is_created = Cart.objects.get_or_create(
                 user              = user,
-                product_option_id = product_id
+                product_option_id = product_option_id
             )
             cart.quantity = cart.quantity + quantity
             cart.save()
