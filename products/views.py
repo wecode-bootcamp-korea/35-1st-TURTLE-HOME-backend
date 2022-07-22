@@ -22,4 +22,4 @@ class SubCategoryView(View):
                 'category_id': category_id,
             })
         
-        return JsonResponse({'message':result}, status=200)
+        return JsonResponse({'result':result}, status=200)
