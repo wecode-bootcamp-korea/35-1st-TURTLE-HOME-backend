@@ -21,6 +21,31 @@ class SubCategoryView(View):
         
         return JsonResponse({'result':result}, status=200)    
     
+class ProductDetailView(View):
+    def get(self, request, product_id):
+
+        try:
+            product = Product.objects.get(id=product_id)   
+            options = product.productoption_set.all()  
+                
+            result = { 
+                'id'             : product.id,
+                'name'           : product.name,
+                'number'         : product.number,
+                'description'    : product.description,
+                'image_url'      : product.image_url,
+                'sub_category_id': product.sub_category_id,
+                'options'        : [{ 
+                    'size'  : option.size.name,
+                    'price' : option.price 
+                } for option in options]
+            }
+            
+            return JsonResponse({'result':result}, status=200)
+            
+        except Product.DoesNotExist:
+            return JsonResponse({'message':'Product does not exist.'}, status=404)
+    
 class ProductListView(View):
     def get(self, request):
         
@@ -56,3 +81,4 @@ class ProductListView(View):
         
 
         return JsonResponse({'result':'test'}, status=200)
+     
