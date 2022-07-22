@@ -20,5 +20,6 @@ from products.views import SubCategoryView
 
 urlpatterns = [
     path("users", include("users.urls")),
-    path("categories/<int:category_id>/subcategories", SubCategoryView.as_view())
+    path("categories/<int:category_id>/subcategories", SubCategoryView.as_view()),
+    path("products", include("products.urls"))
 ]
