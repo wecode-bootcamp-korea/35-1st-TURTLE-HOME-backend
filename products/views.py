@@ -26,7 +26,7 @@ class ProductDetailView(View):
 
         try:
             product = Product.objects.get(id=product_id)   
-            options = product.productoption_set.filter(product_id = product.id)  
+            options = product.productoption_set.all()  
                 
             result = { 
                 'id'             : product.id,
