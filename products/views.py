@@ -27,15 +27,19 @@ class ProductDetailView(View):
         try:
             product = Product.objects.get(id=product_id)   
             options = product.productoption_set.filter(product_id = product.id)  
-            
-            result = { 'id'              : product.id,
-                        'name'           : product.name,
-                        'number'         : product.number,
-                        'description'    : product.description,
-                        'image_url'      : product.image_url,
-                        'sub_category_id': product.sub_category_id,
-                        'options'        : [{ 'size':option.size.name,
-                                             'price':option.price } for option in options]}
+                
+            result = { 
+                'id'             : product.id,
+                'name'           : product.name,
+                'number'         : product.number,
+                'description'    : product.description,
+                'image_url'      : product.image_url,
+                'sub_category_id': product.sub_category_id,
+                'options'        : [{ 
+                    'size'  : option.size.name,
+                    'price' : option.price 
+                } for option in options]
+            }
             
             return JsonResponse({'result':result}, status=200)
             
