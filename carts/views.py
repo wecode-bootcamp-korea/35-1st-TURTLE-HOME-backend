@@ -51,3 +51,23 @@ class CartView(View):
         } for cart in carts]
 
         return JsonResponse({'results' : result}, status = 201)
+        
+class CartDeleteView(View):
+    @signin_decorator
+    def delete(self, request, cart_id):
+        try:
+            user = request.user
+            cart = Cart.objects.get(id = cart_id, user = user)
+
+            if not Cart.objects.filter(id = cart_id, user = user).exists():
+                return JsonResponse({'message' : 'DOES_NOT_EXISTS'}, status=400)
+
+            cart.delete()
+
+            return JsonResponse({'message' : 'SUCCESS'}, status = 201)
+
+        except Cart.DoesNotExist:
+          return JsonResponse({'message' : 'CART_NOT_EXISTED'}, status=400)
+
+        except KeyError:
+          return JsonResponse({'message' : 'KEY_ERROR'}, status=400)
