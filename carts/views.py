@@ -53,7 +53,6 @@ class CartView(View):
 
         return JsonResponse({'results' : result}, status = 201)
         
-class CartDeleteView(View):
     @signin_decorator
     def delete(self, request, cart_id):
         try:
@@ -73,7 +72,6 @@ class CartDeleteView(View):
         except KeyError:
           return JsonResponse({'message' : 'KEY_ERROR'}, status=400)
 
-class CartPatchView(View):
     @signin_decorator
     def patch(self, request):
         try:
