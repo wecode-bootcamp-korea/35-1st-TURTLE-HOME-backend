@@ -49,36 +49,24 @@ class ProductDetailView(View):
 class ProductListView(View):
     def get(self, request):
         
-        # 상품이름과 최저가 최고가가 나와야한다. 
-        # 하지만 옵션명은 필요가 없어
-        # products = Product.objects.all()    # 객체가 아닌 쿼리셋!!!
-        # product = [ product.productoption_set.filter(product_id = [product.id for product in products])    for product in products]
-        
-        # prices = products.productoption_set.filter(product_id = [product.id for product in products])
-        # print(product)
-        # result = [product.name  for product in products]
-        
-    
-    
+        # 보내줘야할 데이터 : ID/상품명/이미지/가격들 전부    
     
         # 1. 전체 상품을 가져온다.
-        # 2. 전체상품을 가져오면, 여러개니까 객체가 쿼리셋에 담겨있음
+        # 2. 전체 상품은 여러개니까 객체들이 쿼리셋에 담아 반환된다.
         
-        # 백에서 줄때 가격자체를 옵션에 따라 다 준다
-        # 대신에 가격을 정렬해서 주면 프론트에서 0번째 최소가격, 마지막꺼는 최대가격
-        # 1. 상품가격이 1개일때 분기처리, 여러개일떄 분기처리를 해서 줘야하고.
+        # 백에서 줄 때 옵션에 따른 가격들을 다 준다.
+        # 대신에 가격을 정렬할 때 [10000,20000,30000,40000] 오름차순으로 정렬하면 프론트에서 인덱스값을 사용하여 최소값, 최대값 사용 가능
+        # 상품 가격이 1개일 때도 [10000] 리스트에 담아서 주기로 합의함
+        
+        products = Product.objects.all()   # 전체 상품 객체들을 가져온다 => 여러개니까 products에 쿼리셋이 담김 => 반복문을 돌며 담기
+            
+        result = [{ 'id'       : product.id, 
+                    'name'     : product.name,
+                    'image_url': product.image_url,
+                    'prices'   : [product.productoption_set.filter(product_id = product.id)[i].price for i in range(len(product.productoption_set.filter(product_id = product.id)))]} for product in products]
 
-        products = Product.objects.all()    # 객체들이 쿼리셋으로 products에 담겨있다.
-        
-        a = [product.productoption_set.all()  for product in products]
-        print(a)    # _set을 .name으로 사용 못함. 쿼리셋
-        print(a.price)
-        
-        # result = [{'name':product.name,
-        #            'id'   : product.id,
-        #            'price': product.productoption_set.price} for product in products]
-        
-        
 
-        return JsonResponse({'result':'test'}, status=200)
+        return JsonResponse({'result':result}, status=200)
+    
+    
      
