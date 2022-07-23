@@ -63,8 +63,9 @@ class ProductListView(View):
         result = [{ 'id'       : product.id, 
                     'name'     : product.name,
                     'image_url': product.image_url,
-                    'prices'   : [product.productoption_set.filter(product_id = product.id)[i].price for i in range(len(product.productoption_set.filter(product_id = product.id)))]} for product in products]
-
+                    'prices'   : 
+                        [p.price for p in product.productoption_set.filter(product_id = product.id)]
+                    } for product in products] 
 
         return JsonResponse({'result':result}, status=200)
     
