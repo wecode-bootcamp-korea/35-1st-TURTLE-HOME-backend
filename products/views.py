@@ -50,11 +50,8 @@ class ProductDetailView(View):
 class ProductListView(View):
     def get(self, request):
         
-        sort_condition = request.GET.get('sort-by')   # get메소드는 해당 키값에 대한 벨류값이 없을 경우 None을 리턴한다
+        sort_condition = request.GET.get('sort-by')   
         
-        # 정렬은 중복선택 안됨 -> 낮은가격/높은가격/최신에 따른 분기처리 각각하기
-        
-        # 낮은 가격순 => price
         if sort_condition == 'price':
             products =  Product.objects.all()
             
@@ -69,7 +66,6 @@ class ProductListView(View):
         
             return JsonResponse({'message':'Ordered by lowest price', 'result':sorted_result}, status=200)
         
-        # 높은 가격순 => -price
         elif sort_condition == '-price':
             products =  Product.objects.all()
             
@@ -84,7 +80,6 @@ class ProductListView(View):
         
             return JsonResponse({'message':'Ordered by highest price', 'result':sorted_result}, status=200)
         
-        # 최신 등록순 => -id
         elif sort_condition == '-id':
             products = Product.objects.all().order_by('-created_at')
             
@@ -97,7 +92,6 @@ class ProductListView(View):
             
             return JsonResponse({'message':'Ordered by newest', 'result':result}, status=200)
         
-        # 일반
         products = Product.objects.all()   
             
         result = [{ 'id'       : product.id, 
