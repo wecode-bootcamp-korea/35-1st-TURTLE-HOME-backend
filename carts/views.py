@@ -1,7 +1,8 @@
 import json
 
-from django.views     import View
-from django.http      import JsonResponse
+from django.views           import View
+from django.http            import JsonResponse
+from django.core.exceptions import MultipleObjectsReturned
 
 from .models          import Cart
 from core.utils       import signin_decorator
@@ -71,3 +72,29 @@ class CartDeleteView(View):
 
         except KeyError:
           return JsonResponse({'message' : 'KEY_ERROR'}, status=400)
+
+class CartPatchView(View):
+    @signin_decorator
+    def patch(self, request):
+        try:
+            data     = json.loads(request.body)
+            user     = request.user
+            cart_id  = request.GET.get('id')
+            quantity = data['quantity']
+
+            if not Cart.objects.filter(id=cart_id, user=user).exists():
+                return JsonResponse({'message' : 'INVALID_CART_ID'}, status=404)
+
+            if quantity <= 0:
+                return JsonResponse({'message' : 'QUANTITY_ERROR'}, status=400)
+
+            cart = Cart.objects.get(id=cart_id, user=user)
+
+            cart.quantity = quantity
+            cart.save()
+            return JsonResponse({'quantity' : cart.quantity}, status=200)
+
+        except MultipleObjectsReturned:
+            return JsonResponse({'message' : 'MULTIPLE_OBJECTS_RETURNED'}, status=400)
+        except KeyError:
+            return JsonResponse({'message' : 'KEY_ERROR'}, status = 400)
