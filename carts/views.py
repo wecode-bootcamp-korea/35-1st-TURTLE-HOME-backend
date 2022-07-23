@@ -52,7 +52,6 @@ class CartView(View):
 
         return JsonResponse({'results' : result}, status = 201)
         
-class CartDeleteView(View):
     @signin_decorator
     def delete(self, request, cart_id):
         try:
