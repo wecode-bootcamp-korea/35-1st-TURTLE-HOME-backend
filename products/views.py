@@ -49,6 +49,32 @@ class ProductDetailView(View):
 class ProductListView(View):
     def get(self, request):
         
+        sorting = request.GET.get('sort-by')   # get메소드는 해당 키값에 대한 벨류값이 없을 경우 None을 리턴한다
+        
+        # 정렬은 중복선택 안됨 -> 낮은가격/높은가격/최신에 따른 분기처리 각각하기
+        
+        # 낮은 가격순 => price
+        if sorting == 'price':
+            pass
+        
+        
+        # 높은 가격순 => -price
+        elif sorting == '-price':
+            pass
+        
+        # 최신 등록순 => -id
+        elif sorting == '-id':
+            products = Product.objects.all().order_by('-id')
+            
+            result = [{ 'id'       : product.id, 
+                        'name'     : product.name,
+                        'image_url': product.image_url,
+                        'prices'   : [int(p.price) for p in product.productoption_set.filter(product_id = product.id)]
+                    } for product in products] 
+            
+            return JsonResponse({'message':'Ordering by newest', 'result':result}, status=200)
+        
+        # 일반
         products = Product.objects.all()   
             
         result = [{ 'id'       : product.id, 
