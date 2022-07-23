@@ -64,7 +64,7 @@ class ProductListView(View):
         
         # 최신 등록순 => -id
         elif sorting == '-id':
-            products = Product.objects.all().order_by('-id')
+            products = Product.objects.all().order_by('-created_at')
             
             result = [{ 'id'       : product.id, 
                         'name'     : product.name,
