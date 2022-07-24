@@ -52,46 +52,6 @@ class ProductListView(View):
         
         sort_condition = request.GET.get('sort-by')   
         
-        if sort_condition == 'price':
-            products =  Product.objects.all()
-            
-            result = [{ 'id'       : product.id, 
-                        'name'     : product.name,
-                        'image_url': product.image_url,
-                        'prices'   : 
-                            [int(p.price) for p in product.productoption_set.filter(product_id = product.id)]
-                        } for product in products] 
-        
-            sorted_result = sorted(result, key = lambda x : x['prices'][0])
-        
-            return JsonResponse({'message':'Ordered by lowest price', 'result':sorted_result}, status=200)
-        
-        elif sort_condition == '-price':
-            products =  Product.objects.all()
-            
-            result = [{ 'id'       : product.id, 
-                        'name'     : product.name,
-                        'image_url': product.image_url,
-                        'prices'   : 
-                            [int(p.price) for p in product.productoption_set.filter(product_id = product.id)]
-                        } for product in products] 
-        
-            sorted_result = sorted(result, key = lambda x : x['prices'][0], reverse=True)
-        
-            return JsonResponse({'message':'Ordered by highest price', 'result':sorted_result}, status=200)
-        
-        elif sort_condition == '-id':
-            products = Product.objects.all().order_by('-created_at')
-            
-            result = [{ 'id'       : product.id, 
-                        'name'     : product.name,
-                        'image_url': product.image_url,
-                        'prices'   : 
-                            [int(p.price) for p in product.productoption_set.filter(product_id = product.id)]
-                        } for product in products] 
-            
-            return JsonResponse({'message':'Ordered by newest', 'result':result}, status=200)
-        
         products = Product.objects.all()   
             
         result = [{ 'id'       : product.id, 
@@ -100,7 +60,32 @@ class ProductListView(View):
                     'prices'   : 
                         [int(p.price) for p in product.productoption_set.filter(product_id = product.id)]
                     } for product in products] 
-
+        
+        if sort_condition == 'price':
+                    
+            sorted_result = sorted(result, key = lambda x : x['prices'][0])
+        
+            return JsonResponse({'message':'Ordered by lowest price', 'result':sorted_result}, status=200)
+        
+        elif sort_condition == '-price':
+        
+            sorted_result = sorted(result, key = lambda x : x['prices'][0], reverse=True)
+        
+            return JsonResponse({'message':'Ordered by highest price', 'result':sorted_result}, status=200)
+        
+        elif sort_condition == '-id':
+            
+            products = products.order_by('-created_at')
+            
+            sorted_result = [{  'id'       : product.id, 
+                                'name'     : product.name,
+                                'image_url': product.image_url,
+                                'prices'   : 
+                                    [int(p.price) for p in product.productoption_set.filter(product_id = product.id)]
+                                } for product in products] 
+            
+            return JsonResponse({'message':'Ordered by newest', 'result':sorted_result}, status=200)
+        
         return JsonResponse({'result':result}, status=200)
     
     
