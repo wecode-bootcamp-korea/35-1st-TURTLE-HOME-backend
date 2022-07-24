@@ -66,7 +66,7 @@ class ProductListView(View):
         
         elif sort_condition == '-price':
         
-            result = sorted(result, key = lambda x : x['prices'][0], reverse=True)
+            result = sorted(result, key = lambda x : x['prices'][-1], reverse=True)
     
         elif sort_condition == '-id':
             
