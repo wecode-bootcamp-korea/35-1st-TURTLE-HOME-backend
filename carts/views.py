@@ -73,11 +73,10 @@ class CartView(View):
           return JsonResponse({'message' : 'KEY_ERROR'}, status=400)
 
     @signin_decorator
-    def patch(self, request):
+    def patch(self, request, cart_id):
         try:
             data     = json.loads(request.body)
             user     = request.user
-            cart_id  = request.GET.get('id')
             quantity = data['quantity']
 
             if not Cart.objects.filter(id=cart_id, user=user).exists():
