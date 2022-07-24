@@ -60,7 +60,7 @@ class CartView(View):
             cart = Cart.objects.get(id = cart_id, user = user)
 
             if not Cart.objects.filter(id = cart_id, user = user).exists():
-                return JsonResponse({'message' : 'DOES_NOT_EXISTS'}, status=400)
+                return JsonResponse({'message' : 'DOES_NOT_EXISTS'}, status=404)
 
             cart.delete()
 
@@ -89,7 +89,8 @@ class CartView(View):
 
             cart.quantity = quantity
             cart.save()
-            return JsonResponse({'quantity' : cart.quantity}, status=200)
+            
+            return JsonResponse({'quantity' : cart.quantity}, status=201)
 
         except MultipleObjectsReturned:
             return JsonResponse({'message' : 'MULTIPLE_OBJECTS_RETURNED'}, status=400)
