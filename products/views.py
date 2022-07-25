@@ -1,6 +1,6 @@
 from django.http      import JsonResponse
 from django.views     import View
-from django.db.models import Min
+from django.db.models import Min, Q
 
 from products.models import Product, SubCategory
 
@@ -50,8 +50,12 @@ class ProductDetailView(View):
 class ProductListView(View):
     def get(self, request):
         
-        sort_by = request.GET.get('sort_by')
-        sizes   = request.GET.getlist('size')
+        sort_by   = request.GET.get('sort_by')
+        sizes     = request.GET.getlist('size')
+        min_price = request.GET.get('min_price', 0)
+        max_price = request.GET.get('max_price', 250000)
+        
+        q = Q()
         
         sort_conditions = {
             'high_price'  : '-price',
@@ -59,15 +63,19 @@ class ProductListView(View):
             'newest'      : '-created_at'
         }
         
-        sort_field = sort_conditions.get(sort_by, 'id')   
+        sort_field = sort_conditions.get(sort_by, 'id')
         
-        products = Product.objects.annotate(price = Min('productoption__price'))
+        products   = Product.objects.annotate(price = Min('productoption__price'))
+        
+        q &= Q(price__range = (min_price, max_price)) 
         
         if sizes : 
-            products = products.filter(productoption__size__name__in=sizes).order_by(sort_field)
+            q.add(Q(productoption__size__name__in = sizes), q.AND)
         
-        else : 
-            products = products.order_by(sort_field)
+        if max_price:
+            q.add(Q(productoption__price__range = (min_price, max_price)), q.AND)
+    
+        products = products.filter(q).order_by(sort_field)
             
         result = [{ 'id'       : product.id, 
                     'name'     : product.name,
