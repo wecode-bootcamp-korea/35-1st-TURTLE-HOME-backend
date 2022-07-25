@@ -63,7 +63,7 @@ class ProductListView(View):
             'newest'      : '-created_at'
         }
         
-        sort_field = sort_conditions.get(sort_by, 'id')
+        sort_field = sort_conditions.get(sort_by, 'created_at')
         
         products   = Product.objects.annotate(price = Min('productoption__price'))
         
