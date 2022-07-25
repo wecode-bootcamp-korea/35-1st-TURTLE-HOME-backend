@@ -50,4 +50,4 @@ class CartView(View):
             "quantity"         : cart.quantity
         } for cart in carts]
 
-        return JsonResponse({'results' : result}, status = 201)
+        return JsonResponse({'results' : result}, status = 200)
