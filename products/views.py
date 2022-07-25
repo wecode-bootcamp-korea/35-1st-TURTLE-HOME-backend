@@ -1,6 +1,6 @@
 from django.http      import JsonResponse
 from django.views     import View
-from django.db.models import Min, Q
+from django.db.models import Min
 
 from products.models import Product, SubCategory
 
@@ -64,7 +64,7 @@ class ProductListView(View):
         products = Product.objects.annotate(price = Min('productoption__price'))
         
         if sizes : 
-            products = products.filter(Q(productoption__size__name__in=sizes)).order_by(sort_field)
+            products = products.filter(productoption__size__name__in=sizes).order_by(sort_field)
         
         else : 
             products = products.order_by(sort_field)
