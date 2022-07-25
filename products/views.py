@@ -1,5 +1,6 @@
 from django.http      import JsonResponse
 from django.views     import View
+from django.db.models import F, Min
 
 from products.models import Product, SubCategory
 
@@ -48,66 +49,24 @@ class ProductDetailView(View):
     
 class ProductListView(View):
     def get(self, request):
+
+        sort  = request.GET.get('sort_by')
         
-        sort_condition  = request.GET.get('sort-by')
-        size_conditions = request.GET.getlist('size')
-            
-        products = Product.objects.all()   
-            
+        sort_conditions = {
+            'high_price'  : '-price',
+            'low_price'   : 'price',
+            'latest'      : '-created_at'
+        }
+        
+        sort_field = sort_conditions.get(sort, 'id')   
+                
+        products = Product.objects.annotate(price = Min('productoption__price')).order_by(sort_field)
+                    
         result = [{ 'id'       : product.id, 
                     'name'     : product.name,
                     'image_url': product.image_url,
                     'prices'   : 
                         [int(p.price) for p in product.productoption_set.filter(product_id = product.id)]
-                    } for product in products] 
-        
-        if sort_condition == 'price':
-                    
-            if size_conditions: 
-                
-                products = products.filter(productoption__size__name__in=size_conditions).order_by('id').distinct()
-
-                result = [{ 'id'       : product.id, 
-                            'name'     : product.name,
-                            'image_url': product.image_url,
-                            'prices'   : 
-                                    [int(p.price) for p in product.productoption_set.filter(product_id = product.id)]
-                            } for product in products] 
-                    
-            result = sorted(result, key = lambda x : x['prices'][0])
-        
-        elif sort_condition == '-price':
-            
-            if size_conditions:  
-                
-                products = products.filter(productoption__size__name__in=size_conditions).order_by('id').distinct()
-
-                result = [{ 'id'       : product.id, 
-                            'name'     : product.name,
-                            'image_url': product.image_url,
-                            'prices'   : 
-                                    [int(p.price) for p in product.productoption_set.filter(product_id = product.id)]
-                            } for product in products] 
-        
-            result = sorted(result, key = lambda x : x['prices'][-1], reverse=True)
-    
-        elif sort_condition == '-id':
-            
-            if size_conditions: 
-                
-                products = products.filter(productoption__size__name__in=size_conditions).order_by('id').distinct()
-
-                result = [{ 'id'       : product.id, 
-                            'name'     : product.name,
-                            'image_url': product.image_url,
-                            'prices'   : 
-                                    [int(p.price) for p in product.productoption_set.filter(product_id = product.id)]
-                            } for product in products] 
-            
-            result = sorted(result, key = lambda x : x['id'], reverse=True)
+                    } for product in products]             
         
         return JsonResponse({'result':result}, status=200)
-        
-    
-    
-     
