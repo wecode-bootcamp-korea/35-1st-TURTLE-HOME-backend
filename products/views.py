@@ -50,14 +50,13 @@ class ProductDetailView(View):
 class ProductListView(View):
     def get(self, request):
 
-        sort  = request.GET.get('sort_by')
+        sort    = request.GET.get('sort_by')
         
         sort_conditions = {
             'high_price'  : '-price',
             'low_price'   : 'price',
-            'latest'      : '-created_at'
+            'newest'      : '-created_at'
         }
-        
         sort_field = sort_conditions.get(sort, 'id')   
                 
         products = Product.objects.annotate(price = Min('productoption__price')).order_by(sort_field)
