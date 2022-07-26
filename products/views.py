@@ -12,8 +12,8 @@ class SubCategoryView(View):
         subcategories = SubCategory.objects.filter(category_id=category_id)
         
         if not subcategories:
-            return JsonResponse({'message':'Subcategory does not exist.'}, status=400)
-        
+            return JsonResponse({'message':'Subcategory does not exist.'}, status=404)  
+                
         result = [{ 
                     'id'         : subcategory.id,
                     'name'       : subcategory.name,
@@ -55,7 +55,7 @@ class ProductListView(View):
         min_price = request.GET.get('min_price')
         max_price = request.GET.get('max_price')
         
-        q = Q()  
+        products   = Product.objects.annotate(price = Min('productoption__price'))
         
         sort_conditions = {
             'high_price'  : '-price',
@@ -65,7 +65,7 @@ class ProductListView(View):
         
         sort_field = sort_conditions.get(sort_by, 'created_at')
         
-        products   = Product.objects.annotate(price = Min('productoption__price'))
+        q = Q()
         
         if size : 
             q &= Q(productoption__size__name = size)
