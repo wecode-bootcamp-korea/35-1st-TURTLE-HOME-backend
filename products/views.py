@@ -71,11 +71,10 @@ class ProductListView(View):
             q &= Q(productoption__size__name = size)
         
         if min_price:
-            if max_price == None:
-                q.add(Q(price__gte = min_price), q.AND)
+            q.add(Q(price__gte = min_price), q.AND)
                 
-            else:
-                q.add(Q(price__lt = max_price) & Q(price__gte = min_price), q.AND)   
+        if max_price:
+            q.add(Q(price__lt = max_price), q.AND)   
     
         products = products.filter(q).order_by(sort_field)
             
