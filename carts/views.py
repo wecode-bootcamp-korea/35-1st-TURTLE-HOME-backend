@@ -34,3 +34,20 @@ class CartView(View):
 
         except KeyError:
             return JsonResponse({'message' : 'KEY_ERROR'}, status=400)
+
+    @signin_decorator
+    def get(self, request):
+        carts = Cart.objects.filter(user = request.user)
+        result = [{
+            "cart_id"          : cart.id,
+            "user_id"          : cart.user_id,
+            "product_option_id": cart.product_option_id,
+            "product_name"     : cart.product_option.product.name,
+            "product_price"    : int(cart.product_option.price) * int(cart.quantity),
+            "product_image"    : cart.product_option.product.image_url,
+            "product_number"   : cart.product_option.product.number,
+            "product_size"     : cart.product_option.size.name,
+            "quantity"         : cart.quantity
+        } for cart in carts]
+
+        return JsonResponse({'results' : result}, status = 200)
