@@ -51,11 +51,11 @@ class ProductListView(View):
     def get(self, request):
         
         sort_by   = request.GET.get('sort_by')
-        sizes     = request.GET.getlist('size')
-        min_price = request.GET.get('min_price', 0)
-        max_price = request.GET.get('max_price', 250000)
+        size      = request.GET.getlist('size')
+        min_price = request.GET.get('min_price')
+        max_price = request.GET.get('max_price')
         
-        q = Q()
+        q = Q()  
         
         sort_conditions = {
             'high_price'  : '-price',
@@ -67,13 +67,15 @@ class ProductListView(View):
         
         products   = Product.objects.annotate(price = Min('productoption__price'))
         
-        q &= Q(price__range = (min_price, max_price)) 
+        if size : 
+            q &= Q(productoption__size__name = size)
         
-        if sizes : 
-            q.add(Q(productoption__size__name__in = sizes), q.AND)
-        
-        if max_price:
-            q.add(Q(productoption__price__range = (min_price, max_price)), q.AND)
+        if min_price:
+            if max_price == None:
+                q.add(Q(price__gte = min_price), q.AND)
+                
+            else:
+                q.add(Q(price__lt = max_price) & Q(price__gte = min_price), q.AND)   
     
         products = products.filter(q).order_by(sort_field)
             
@@ -81,7 +83,7 @@ class ProductListView(View):
                     'name'     : product.name,
                     'image_url': product.image_url,
                     'prices'   : 
-                        [int(p.price) for p in product.productoption_set.filter(product_id = product.id)]
+                        [int(p.price) for p in product.productoption_set.filter(product_id = product.id)] 
                     } for product in products]  
             
         return JsonResponse({'result':result}, status=200)   
