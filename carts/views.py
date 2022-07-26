@@ -50,8 +50,8 @@ class CartView(View):
             "quantity"         : cart.quantity
         } for cart in carts]
 
-        return JsonResponse({'results' : result}, status = 201)
-        
+        return JsonResponse({'results' : result}, status = 200)
+
     @signin_decorator
     def delete(self, request, cart_id):
         try:
@@ -59,11 +59,11 @@ class CartView(View):
             cart = Cart.objects.get(id = cart_id, user = user)
 
             if not Cart.objects.filter(id = cart_id, user = user).exists():
-                return JsonResponse({'message' : 'DOES_NOT_EXISTS'}, status=400)
+                return JsonResponse({'message' : 'DOES_NOT_EXISTS'}, status=404)
 
             cart.delete()
 
-            return JsonResponse({'message' : 'SUCCESS'}, status = 201)
+            return JsonResponse({'message' : 'SUCCESS'}, status = 204)
 
         except Cart.DoesNotExist:
           return JsonResponse({'message' : 'CART_NOT_EXISTED'}, status=400)
