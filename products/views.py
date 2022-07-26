@@ -51,7 +51,7 @@ class ProductListView(View):
     def get(self, request):
         
         sort_by   = request.GET.get('sort_by')
-        size      = request.GET.getlist('size')
+        size      = request.GET.get('size')
         min_price = request.GET.get('min_price')
         max_price = request.GET.get('max_price')
         
