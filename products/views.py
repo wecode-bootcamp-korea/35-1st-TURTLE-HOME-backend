@@ -72,6 +72,8 @@ class ProductListView(View):
         size      = request.GET.get('size')
         min_price = request.GET.get('min_price', 0)
         max_price = request.GET.get('max_price')
+        limit     = int(request.GET.get('limit', 20))
+        offset    = int(request.GET.get('offset', 0))
         
         sort_conditions = {
             'high_price'  : '-min_price',
@@ -95,7 +97,7 @@ class ProductListView(View):
         if max_price :
             q.add(Q(min_price__lt = max_price), q.AND)   
             
-        products = products.filter(q).order_by(sort_field)
+        products = products.filter(q).order_by(sort_field)[offset:offset+limit]
         
         result = [{ 
             'id'       : product.id,
