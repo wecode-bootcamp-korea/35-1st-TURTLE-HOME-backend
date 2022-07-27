@@ -48,24 +48,6 @@ class ProductDetailView(View):
             return JsonResponse({'message':'Product does not exist.'}, status=404)
     
 class ProductListView(View):
-    """
-    목적 : 상품의 목록을 반환한다.
-    
-    조건 : 
-    1. 필터(사이즈,가격)
-    2. 정렬(낮은 가격순, 높은 가격순, 최신순)
-    3. 페이지네이션 (목록을 주는건 페이지네이션이 필요하다) 데이터의 부하를 막기 위해서 리스트를 줄 때 무조건 필요하다. db에서목록을 가져올땐 페이지네이션 걸기    
-    
-    => 먼저 쉬운 작업 후 조건을 하나씩 걸어보기
-    
-    구조 : 
-    1. request로 받은 값들을 먼저 검증한다.  => key에러 발생해보고 아래 로직 안가도 걸를 수 있도록!!
-    2. 로직 짜고
-      - 필터
-      - 정렬
-      - 위의 조건을 가지고 데이터를 가져옴 + 페이지네이션
-    3. response 주기
-    """
     def get(self, request):
         
         sort_by   = request.GET.get('sort_by')
