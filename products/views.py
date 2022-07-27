@@ -1,5 +1,6 @@
-from django.http  import JsonResponse
-from django.views import View
+from django.http      import JsonResponse
+from django.views     import View
+from django.db.models import Min, Max, Q
 
 from products.models import Product, SubCategory
 
@@ -11,8 +12,8 @@ class SubCategoryView(View):
         subcategories = SubCategory.objects.filter(category_id=category_id)
         
         if not subcategories:
-            return JsonResponse({'message':'Subcategory does not exist.'}, status=400)
-        
+            return JsonResponse({'message':'Subcategory does not exist.'}, status=404)  
+                
         result = [{ 
                     'id'         : subcategory.id,
                     'name'       : subcategory.name,
@@ -20,7 +21,7 @@ class SubCategoryView(View):
                     'category_id': category_id } for subcategory in subcategories]
         
         return JsonResponse({'result':result}, status=200)    
-     
+    
 class ProductDetailView(View):
     def get(self, request, product_id):
 
@@ -45,3 +46,46 @@ class ProductDetailView(View):
             
         except Product.DoesNotExist:
             return JsonResponse({'message':'Product does not exist.'}, status=404)
+    
+class ProductListView(View):
+    def get(self, request):
+        
+        sort_by   = request.GET.get('sort_by')
+        size      = request.GET.get('size')
+        min_price = request.GET.get('min_price', 0)
+        max_price = request.GET.get('max_price')
+        limit     = int(request.GET.get('limit', 20))
+        offset    = int(request.GET.get('offset', 0))
+        
+        sort_conditions = {
+            'high_price'  : '-min_price',
+            'low_price'   : 'min_price',
+            'newest'      : '-created_at'
+        }
+        
+        sort_field = sort_conditions.get(sort_by, 'created_at')
+        
+        q = Q()
+        
+        if size: 
+            q &= Q(productoption__size__name = size)
+        
+        q.add(Q(min_price__gte = min_price), q.AND)
+                
+        if max_price :
+            q.add(Q(min_price__lt = max_price), q.AND)   
+            
+        products = Product.objects\
+            .annotate(min_price = Min('productoption__price'))\
+            .annotate(max_price = Max('productoption__price'))\
+            .filter(q).order_by(sort_field)[offset:offset+limit]
+        
+        result = [{ 
+            'id'       : product.id,
+            'name'     : product.name,
+            'image_url': product.image_url,
+            'min_price': product.min_price,
+            'max_price': product.max_price 
+        } for product in products]
+        
+        return JsonResponse({'result':result}, status=200)   
