@@ -51,26 +51,20 @@ class CartView(View):
             "quantity"         : cart.quantity
         } for cart in carts]
 
-        return JsonResponse({'results' : result}, status = 201)
-        
+        return JsonResponse({'results' : result}, status = 200)
+
     @signin_decorator
     def delete(self, request, cart_id):
         try:
             user = request.user
             cart = Cart.objects.get(id = cart_id, user = user)
 
-            if not Cart.objects.filter(id = cart_id, user = user).exists():
-                return JsonResponse({'message' : 'DOES_NOT_EXISTS'}, status=400)
-
             cart.delete()
 
-            return JsonResponse({'message' : 'SUCCESS'}, status = 201)
+            return JsonResponse({'message' : 'SUCCESS'}, status = 204)
 
         except Cart.DoesNotExist:
-          return JsonResponse({'message' : 'CART_NOT_EXISTED'}, status=400)
-
-        except KeyError:
-          return JsonResponse({'message' : 'KEY_ERROR'}, status=400)
+          return JsonResponse({'message' : 'CART_NOT_EXISTED'}, status=404)
 
     @signin_decorator
     def patch(self, request, cart_id):
@@ -86,12 +80,14 @@ class CartView(View):
 
             cart.quantity = quantity
             cart.save()
-            
-            return JsonResponse({'quantity' : cart.quantity}, status=201)
+
+            return JsonResponse({'message' : 'SUCCESS'}, status=201)
 
         except MultipleObjectsReturned:
             return JsonResponse({'message' : 'MULTIPLE_OBJECTS_RETURNED'}, status=400)
         except Cart.DoesNotExist:
-            return JsonResponse({'message' : 'DOES_NOT_CART'}, status=400)
+            return JsonResponse({'message' : 'DOES_NOT_CART'}, status=404)
         except KeyError:
-            return JsonResponse({'message' : 'KEY_ERROR'}, status = 400)
+            return JsonResponse({'message' : 'KEY_ERROR'}, status = 400) 
+
+
