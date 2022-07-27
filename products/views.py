@@ -37,8 +37,9 @@ class ProductDetailView(View):
                 'image_url'      : product.image_url,
                 'sub_category_id': product.sub_category_id,
                 'options'        : [{ 
-                    'size'  : option.size.name,
-                    'price' : option.price 
+                    'size_id': option.size.id,
+                    'size'   : option.size.name,
+                    'price'  : option.price
                 } for option in options]
             }
             
