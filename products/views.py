@@ -67,10 +67,6 @@ class ProductListView(View):
         
         q = Q()
         
-        products = Product.objects\
-            .annotate(min_price = Min('productoption__price'))\
-            .annotate(max_price = Max('productoption__price'))
-        
         if size: 
             q &= Q(productoption__size__name = size)
         
@@ -79,7 +75,10 @@ class ProductListView(View):
         if max_price :
             q.add(Q(min_price__lt = max_price), q.AND)   
             
-        products = products.filter(q).order_by(sort_field)[offset:offset+limit]
+        products = Product.objects\
+            .annotate(min_price = Min('productoption__price'))\
+            .annotate(max_price = Max('productoption__price'))\
+            .filter(q).order_by(sort_field)[offset:offset+limit]
         
         result = [{ 
             'id'       : product.id,
