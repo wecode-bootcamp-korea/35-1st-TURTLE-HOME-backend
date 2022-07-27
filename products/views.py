@@ -69,7 +69,6 @@ class ProductListView(View):
         
         if size : 
             q &= Q(productoption__size__name = size)
-        
         if min_price:
             q.add(Q(price__gte = min_price), q.AND)
                 
@@ -82,7 +81,7 @@ class ProductListView(View):
                     'name'     : product.name,
                     'image_url': product.image_url,
                     'prices'   : 
-                        [int(p.price) for p in product.productoption_set.filter(product_id = product.id)] 
+                        [int(p.price) for p in product.productoption_set.all()] 
                     } for product in products]  
-            
+        
         return JsonResponse({'result':result}, status=200)   
