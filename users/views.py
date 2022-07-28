@@ -67,7 +67,7 @@ class SignInView(View):
         except User.DoesNotExist:
             return JsonResponse({'message' : 'INVALID_USER'}, status=401)
 
-class MemberShipOutView(View):
+class UserView(View):
     @signin_decorator
     def delete(self, request):
         try:
@@ -77,10 +77,10 @@ class MemberShipOutView(View):
             email    = data['email']
 
             if not User.objects.filter(id = user.id, email = email).exists():
-                return JsonResponse({'message' : 'USER_NOT_EXISTS'}, status=404)
+                return JsonResponse({'message' : 'INVALID_USER'}, status=404)
 
             if not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')): 
-                return JsonResponse({'message' : 'INVALID_PASSWORD'}, status=401)
+                return JsonResponse({'message' : 'INVALID_USER'}, status=401)
 
             user.delete()
             
