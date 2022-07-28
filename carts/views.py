@@ -1,7 +1,8 @@
 import json
 
-from django.views  import View
-from django.http   import JsonResponse
+from django.views            import View
+from django.http             import JsonResponse
+from django.core.exceptions  import MultipleObjectsReturned
 
 from .models          import Cart
 from core.utils       import signin_decorator
@@ -73,3 +74,27 @@ class CartView(View):
 
         except Cart.DoesNotExist:
           return JsonResponse({'message' : 'CART_NOT_EXISTED'}, status=404)
+
+    @signin_decorator
+    def patch(self, request, cart_id):
+        try:
+            data     = json.loads(request.body)
+            user     = request.user
+            quantity = data['quantity']
+
+            if quantity <= 0:
+                return JsonResponse({'message' : 'QUANTITY_ERROR'}, status=400)
+
+            cart = Cart.objects.get(id=cart_id, user=user)
+
+            cart.quantity = quantity
+            cart.save()
+
+            return JsonResponse({'message' : 'SUCCESS'}, status=200)
+
+        except MultipleObjectsReturned:
+            return JsonResponse({'message' : 'MULTIPLE_OBJECTS_RETURNED'}, status=400)
+        except Cart.DoesNotExist:
+            return JsonResponse({'message' : 'DOES_NOT_CART'}, status=404)
+        except KeyError:
+            return JsonResponse({'message' : 'KEY_ERROR'}, status = 400) 
