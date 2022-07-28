@@ -9,6 +9,7 @@ from django.conf            import settings
 
 from .validation import email_check, password_check
 from .models     import User
+from core.utils  import signin_decorator
 
 # Create your views here.
 
@@ -66,3 +67,24 @@ class SignInView(View):
         except User.DoesNotExist:
             return JsonResponse({'message' : 'INVALID_USER'}, status=401)
 
+class UserView(View):
+    @signin_decorator
+    def delete(self, request):
+        try:
+            data     = json.loads(request.body)
+            user     = request.user
+            password = data['password']
+            email    = data['email']
+
+            if not User.objects.filter(id = user.id, email = email).exists():
+                return JsonResponse({'message' : 'INVALID_USER'}, status=404)
+
+            if not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')): 
+                return JsonResponse({'message' : 'INVALID_USER'}, status=401)
+
+            user.delete()
+            
+            return JsonResponse({'message' : 'SUCCESS'}, status=204)
+        
+        except KeyError:
+            return JsonResponse({'message' : 'KEY_ERROR'}, status=400)
