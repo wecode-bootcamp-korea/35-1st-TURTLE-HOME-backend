@@ -1,6 +1,6 @@
 from django.http      import JsonResponse
 from django.views     import View
-from django.db.models import Min, Max, Q
+from django.db.models import Min, Max
 
 from products.models import Product, SubCategory
 
@@ -52,9 +52,6 @@ class ProductListView(View):
     def get(self, request):
         
         sort_by   = request.GET.get('sort_by')
-        size      = request.GET.get('size')
-        min_price = request.GET.get('min_price', 0)
-        max_price = request.GET.get('max_price')
         limit     = int(request.GET.get('limit', 20))
         offset    = int(request.GET.get('offset', 0))
         
@@ -66,20 +63,22 @@ class ProductListView(View):
         
         sort_field = sort_conditions.get(sort_by, 'created_at')
         
-        q = Q()
+        filter_conditions = {
+            'size'     : 'productoption__size__name',
+            'min_price': 'min_price__gte',
+            'max_price': 'min_price__lt'
+        }
         
-        if size: 
-            q &= Q(productoption__size__name = size)
-        
-        q.add(Q(min_price__gte = min_price), q.AND)
-                
-        if max_price :
-            q.add(Q(min_price__lt = max_price), q.AND)   
+        filter_field = {
+            filter_conditions.get(key):value 
+                for (key, value) in request.GET.items() 
+                    if filter_conditions.get(key) 
+        }
             
         products = Product.objects\
             .annotate(min_price = Min('productoption__price'))\
             .annotate(max_price = Max('productoption__price'))\
-            .filter(q).order_by(sort_field)[offset:offset+limit]
+            .filter(**filter_field).order_by(sort_field)[offset:offset+limit]
         
         result = [{ 
             'id'       : product.id,
