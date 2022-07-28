@@ -88,3 +88,25 @@ class UserView(View):
         
         except KeyError:
             return JsonResponse({'message' : 'KEY_ERROR'}, status=400)
+
+    @signin_decorator
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            user = request.user
+            password = data['password']
+
+            if bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')): 
+                return JsonResponse({'message' : 'INVALID_PASSWORD'}, status=401)
+
+            password_check(password)
+
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+            user.password = hashed_password
+            user.save()
+
+            return JsonResponse({'message' : 'SUCCESS'}, status=200)
+
+        except KeyError:
+            return JsonResponse({'message' : 'KEY_ERROR'}, status=400) 
