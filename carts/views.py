@@ -81,7 +81,7 @@ class CartView(View):
             cart.quantity = quantity
             cart.save()
 
-            return JsonResponse({'message' : 'SUCCESS'}, status=201)
+            return JsonResponse({'message' : 'SUCCESS'}, status=200)
 
         except MultipleObjectsReturned:
             return JsonResponse({'message' : 'MULTIPLE_OBJECTS_RETURNED'}, status=400)
