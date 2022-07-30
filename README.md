@@ -26,9 +26,6 @@
 # Modeling
 <img width="1381" alt="스크린샷 2022-07-28 오전 10 46 01" src="https://user-images.githubusercontent.com/78359232/181875825-64d7c1f4-58ce-4ed9-9e48-11e9322e484e.png">
 
-# Result
-
-
 # Features
 - 성바울
   - DB Modeling
