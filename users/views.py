@@ -90,7 +90,7 @@ class UserView(View):
             return JsonResponse({'message' : 'KEY_ERROR'}, status=400)
 
     @signin_decorator
-    def post(self, request):
+    def patch(self, request):
         try:
             data = json.loads(request.body)
             user = request.user
